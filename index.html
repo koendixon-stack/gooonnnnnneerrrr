@@ -1,1 +1,93 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>First-Person Racing Game</title>\n    <style>\n        body {\n            margin: 0;\n            overflow: hidden;\n            display: flex;\n            justify-content: center;\n            align-items: center;\n        }\n        canvas {\n            background: #87CEEB;\n        }\n    </style>\n</head>\n<body>\n    <canvas id="gameCanvas" width="800" height="600"></canvas>\n    <script>\n        const canvas = document.getElementById('gameCanvas');\n        const ctx = canvas.getContext('2d');\n\n        function init() {\n            // Game initialization code goes here\n            ctx.fillStyle = 'gray';\n            ctx.fillRect(0, 0, canvas.width, canvas.height);\n            ctx.fillStyle = 'black';\n            ctx.font = '30px Arial';\n            ctx.fillText('Welcome to the Racing Game!', 100, 100);\n        }\n\n        init();\n    </script>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>First-Person Racing Game</title>
+    <style>
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game variables
+        let isGameRunning = true;
+        let speed = 0;
+        let carPosition = canvas.width / 2;
+        const obstacles = [];
+
+        // Track and control settings
+        const trackWidth = 200;
+        const maxSpeed = 10;
+        const acceleration = 0.1;
+        const brake = 0.2;
+
+        // Obstacle settings
+        const obstacleFrequency = 100; // Frames between obstacles
+
+        function spawnObstacle() {
+            const x = Math.random() * (canvas.width - trackWidth);
+            obstacles.push({x: x, y: 0, width: 40, height: 40});
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (!isGameRunning) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Render track
+            ctx.fillStyle = '#333';
+            ctx.fillRect((canvas.width - trackWidth) / 2, 0, trackWidth, canvas.height);
+
+            // Update speed
+            speed = Math.min(speed + acceleration, maxSpeed);
+            if (obstacles.length > 0) {
+                for (let i = 0; i < obstacles.length; i++) {
+                    const obs = obstacles[i];
+                    obs.y += speed;
+                    ctx.fillStyle = 'red';
+                    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+
+                    // Collision detection
+                    if (obs.y + obs.height > canvas.height - 100 && 
+                        obs.x < carPosition + 20 && obs.x + obs.width > carPosition) {
+                        isGameRunning = false;
+                        alert('Game Over!');
+                    }
+                }
+                obstacles = obstacles.filter(obs => obs.y < canvas.height);
+            }
+
+            // Render car
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(carPosition, canvas.height - 100, 20, 40);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Control
+        window.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && carPosition > (canvas.width - trackWidth) / 2) {
+                carPosition -= 10;
+            } else if (event.key === 'ArrowRight' && carPosition < (canvas.width + trackWidth) / 2 - 20) {
+                carPosition += 10;
+            } else if (event.key === 'ArrowUp') {
+                speed = Math.min(speed + acceleration, maxSpeed);
+            } else if (event.key === 'ArrowDown') {
+                speed = Math.max(speed - brake, 0);
+            }
+        });
+
+        setInterval(spawnObstacle, obstacleFrequency);
+        gameLoop();
+    </script>
+</body>
+</html>
