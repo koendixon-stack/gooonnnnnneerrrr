@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gooning Clicker Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #game { padding: 20px; }
+        button { margin: 5px; }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <h1>Gooning Clicker Game</h1>
+        <button id="clicker">Click me!</button>
+        <p>Goon Count: <span id="goonCount">0</span></p>
+        <p>Upgrades: <button id="autoClicker">Buy Auto-Clicker (100 goons)</button></p>
+        <p>Prestige: <button id="prestige">Prestige (Reset for rewards)</button></p>
+    </div>
+    <script>
+        let goonCount = 0;
+        let autoClickerCount = 0;
+        let prestigeCount = 0;
+        let autoClickerInterval;
+
+        function updateDisplay() {
+            document.getElementById('goonCount').innerText = goonCount;
+        }
+
+        document.getElementById('clicker').addEventListener('click', function() {
+            goonCount += 1;
+            updateDisplay();
+        });
+
+        document.getElementById('autoClicker').addEventListener('click', function() {
+            if (goonCount >= 100) {
+                goonCount -= 100;
+                autoClickerCount += 1;
+                updateDisplay();
+                if (!autoClickerInterval) {
+                    autoClickerInterval = setInterval(function() {
+                        goonCount += 1;
+                        updateDisplay();
+                    }, 1000);
+                }
+            } else {
+                alert('Not enough goons!');
+            }
+        });
+
+        document.getElementById('prestige').addEventListener('click', function() {
+            if (goonCount > 0) {
+                prestigeCount += goonCount;
+                goonCount = 0;
+                autoClickerCount = 0;
+                clearInterval(autoClickerInterval);
+                autoClickerInterval = null;
+                updateDisplay();
+                alert('Prestiged! Total Prestige Points: ' + prestigeCount);
+            } else {
+                alert('No goons to prestige!');
+            }
+        });
+
+        window.onbeforeunload = () => {
+            localStorage.setItem('goonCount', goonCount);
+            localStorage.setItem('autoClickerCount', autoClickerCount);
+            localStorage.setItem('prestigeCount', prestigeCount);
+        };
+
+        window.onload = () => {
+            goonCount = localStorage.getItem('goonCount') || 0;
+            autoClickerCount = localStorage.getItem('autoClickerCount') || 0;
+            prestigeCount = localStorage.getItem('prestigeCount') || 0;
+            updateDisplay();
+        };
+    </script>
+</body>
+</html>
