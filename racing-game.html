@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Racing Game</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #000;
+        }
+        #uiPanel {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div id="uiPanel">
+        <h1>3D Racing Game</h1>
+        <div>Speed: <span id="speed">0</span> km/h</div>
+        <div>Distance: <span id="distance">0</span> m</div>
+        <div>Score: <span id="score">0</span></div>
+        <div>Nitro: <span id="nitro">0</span>%</div>
+        <button id="upgradeBtn">Upgrade</button>
+        <div id="upgrades"></div>
+    </div>
+    <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+    <script>
+        // Game variables
+        let speed = 0;
+        let distance = 0;
+        let score = 0;
+        let nitro = 0;
+        let upgrades = {
+            engine: 0,
+            brakes: 0,
+            shield: 0,
+            steering: 0
+        };
+
+        // Initialize canvas
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Main game loop
+        function gameLoop() {
+            updateGame();
+            drawRoad();
+            drawObstacles();
+            updateUI();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Update game state
+        function updateGame() {
+            distance += speed / 60; // Assuming 60 FPS
+            speed = Math.min(speed + upgrades.engine * 2, 200); // Maximum speed 200 km/h
+            // Logic for obstacle avoidance, nitro boost, and scoring can be added here
+        }
+
+        // Draw road
+        function drawRoad() {
+            ctx.fillStyle = '#555';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(canvas.width / 2 - 50, 0, 100, canvas.height);
+        }
+
+        // Draw obstacles
+        function drawObstacles() {
+            // Logic to draw obstacles
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('speed').innerText = speed.toFixed(2);
+            document.getElementById('distance').innerText = distance.toFixed(2);
+            document.getElementById('score').innerText = score;
+            document.getElementById('nitro').innerText = nitro;
+        }
+
+        // Upgrades system
+        document.getElementById('upgradeBtn').onclick = function() {
+            // Sample upgrade logic
+            upgrades.engine += 1;
+            score += 100;
+        };
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>
