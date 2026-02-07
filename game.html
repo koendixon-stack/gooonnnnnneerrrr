@@ -3,78 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gooning Clicker Game</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        #game { padding: 20px; }
-        button { margin: 5px; }
-    </style>
+    <title>Ultimate Gooning Clicker</title>
 </head>
 <body>
-    <div id="game">
-        <h1>Gooning Clicker Game</h1>
-        <button id="clicker">Click me!</button>
-        <p>Goon Count: <span id="goonCount">0</span></p>
-        <p>Upgrades: <button id="autoClicker">Buy Auto-Clicker (100 goons)</button></p>
-        <p>Prestige: <button id="prestige">Prestige (Reset for rewards)</button></p>
-    </div>
-    <script>
-        let goonCount = 0;
-        let autoClickerCount = 0;
-        let prestigeCount = 0;
-        let autoClickerInterval;
+    <h1>Ultimate Gooning Clicker</h1>
+    <p>Click to earn Goon points!</p>
+    <button id="clickBtn">Click me!</button>
+    <p>Goon Points: <span id="goonPoints">0</span></p>
 
+    <h2>Achievements</h2>
+    <ul id="achievementsList"></ul>
+
+    <h2>Prestige System</h2>
+    <button id="prestigeBtn" disabled>Prestige</button>
+
+    <h2>Passive Income</h2>
+    <p>Passive Income: <span id="passiveIncome">0</span> points/sec</p>
+
+    <script>
+        let goonPoints = 0;
+        let passiveIncome = 0;
+        let earningInterval;
+        let achievements = [];
+
+        // Click event
+        document.getElementById('clickBtn').onclick = function() {
+            goonPoints++;
+            updateDisplay();
+            checkAchievements();
+        };
+
+        // Update display function
         function updateDisplay() {
-            document.getElementById('goonCount').innerText = goonCount;
+            document.getElementById('goonPoints').innerText = goonPoints;
+            document.getElementById('passiveIncome').innerText = passiveIncome;
+            document.getElementById('prestigeBtn').disabled = goonPoints < 1000;  // Example condition
         }
 
-        document.getElementById('clicker').addEventListener('click', function() {
-            goonCount += 1;
-            updateDisplay();
-        });
-
-        document.getElementById('autoClicker').addEventListener('click', function() {
-            if (goonCount >= 100) {
-                goonCount -= 100;
-                autoClickerCount += 1;
-                updateDisplay();
-                if (!autoClickerInterval) {
-                    autoClickerInterval = setInterval(function() {
-                        goonCount += 1;
-                        updateDisplay();
-                    }, 1000);
-                }
-            } else {
-                alert('Not enough goons!');
+        // Check achievements
+        function checkAchievements() {
+            if (goonPoints >= 10 && !achievements.includes('First Click!')) {
+                achievements.push('First Click!');
+                updateAchievementsList();
             }
-        });
+            // Add more achievement conditions as needed
+        }
 
-        document.getElementById('prestige').addEventListener('click', function() {
-            if (goonCount > 0) {
-                prestigeCount += goonCount;
-                goonCount = 0;
-                autoClickerCount = 0;
-                clearInterval(autoClickerInterval);
-                autoClickerInterval = null;
-                updateDisplay();
-                alert('Prestiged! Total Prestige Points: ' + prestigeCount);
-            } else {
-                alert('No goons to prestige!');
-            }
-        });
+        // Update achievements list on UI
+        function updateAchievementsList() {
+            const achievementsList = document.getElementById('achievementsList');
+            achievementsList.innerHTML = '';
+            achievements.forEach(achievement => {
+                const li = document.createElement('li');
+                li.innerText = achievement;
+                achievementsList.appendChild(li);
+            });
+        }
 
-        window.onbeforeunload = () => {
-            localStorage.setItem('goonCount', goonCount);
-            localStorage.setItem('autoClickerCount', autoClickerCount);
-            localStorage.setItem('prestigeCount', prestigeCount);
-        };
-
-        window.onload = () => {
-            goonCount = localStorage.getItem('goonCount') || 0;
-            autoClickerCount = localStorage.getItem('autoClickerCount') || 0;
-            prestigeCount = localStorage.getItem('prestigeCount') || 0;
+        // Prestige function
+        document.getElementById('prestigeBtn').onclick = function() {
+            goonPoints = 0;
+            passiveIncome += 1; // Earn 1 point/sec per prestige
             updateDisplay();
         };
+
+        // Passive income functionality
+        function startEarning() {
+            earningInterval = setInterval(() => {
+                goonPoints += passiveIncome;
+                updateDisplay();
+            }, 1000);
+        }
+
+        // Start earning passive income
+        startEarning();
     </script>
 </body>
 </html>
